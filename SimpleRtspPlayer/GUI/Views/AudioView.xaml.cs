@@ -43,6 +43,7 @@ namespace SimpleRtspPlayer.GUI.Views
         private readonly Action<IDecodedAudioFrame> _invalidateAction;
         private ArrayList audioSeriesData  = new ArrayList();
         public PCMPlayer audioPlayer = new PCMPlayer();
+        private bool _audioSilentFlag = false;
 
         public static readonly DependencyProperty AudioSourceProperty = DependencyProperty.Register(nameof(AudioSource),
             typeof(IAudioSource),
@@ -91,8 +92,8 @@ namespace SimpleRtspPlayer.GUI.Views
             var connectionParameters = new ConnectionParameters(deviceUri, credential);
             _connectionParameters = connectionParameters;
 
-            if (_rawFramesSource != null)
-                return;
+            //if (_rawFramesSource != null)
+            //    return;
 
             //_rawFramesSource = new RawFramesSource(connectionParameters);
             ////_rawFramesSource.ConnectionStatusChanged += ConnectionStatusChanged;
@@ -116,11 +117,24 @@ namespace SimpleRtspPlayer.GUI.Views
         }
         private void OnAudioStopClick(object sender, RoutedEventArgs e)
         {
-
+            _cancellationTokenSource.Cancel();
+            ChartAudio1.Series.Clear();
+            audioSeriesData.Clear();
+            ChartAudio1.ChartAreas.Clear();
+            _audioSilentFlag = false;
         }
         private void OnAudioSilentClick(object sender, RoutedEventArgs e)
         {
-
+            if (_audioSilentFlag)//now silent
+            {
+                CancelSilent();
+                _audioSilentFlag = false;
+            }
+            else
+            {
+                Silent();
+                _audioSilentFlag = true;
+            }
         }
 
         private async Task ReceiveAsync(CancellationToken token)
