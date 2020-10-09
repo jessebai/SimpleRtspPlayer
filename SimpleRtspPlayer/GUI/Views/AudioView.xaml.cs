@@ -45,10 +45,10 @@ namespace SimpleRtspPlayer.GUI.Views
         public PCMPlayer audioPlayer = new PCMPlayer();
         private bool _audioSilentFlag = false;
 
-        public static readonly DependencyProperty AudioSourceProperty = DependencyProperty.Register(nameof(AudioSource),
-            typeof(IAudioSource),
-            typeof(AudioView),
-            new FrameworkPropertyMetadata(OnAudioSourceChanged));
+        //public static readonly DependencyProperty AudioSourceProperty = DependencyProperty.Register(nameof(AudioSource),
+        //    typeof(IAudioSource),
+        //    typeof(AudioView),
+        //    new FrameworkPropertyMetadata(OnAudioSourceChanged));
         public IAudioSource AudioSource
         {
             get => (IAudioSource)GetValue(AudioSourceProperty);
@@ -63,7 +63,7 @@ namespace SimpleRtspPlayer.GUI.Views
         private string _status = string.Empty;
         private readonly RealtimeVideoSource _realtimeVideoSource = new RealtimeVideoSource();
         private readonly RealtimeAudioSource _realtimeAudioSource = new RealtimeAudioSource();
-        private IRawFramesSource _rawFramesSource;
+        //private IRawFramesSource _rawFramesSource;
         //public event EventHandler<string> StatusChanged;
         public IVideoSource I_VideoSource => _realtimeVideoSource;
         public IAudioSource I_AudioSource => _realtimeAudioSource;
@@ -236,21 +236,21 @@ namespace SimpleRtspPlayer.GUI.Views
             ChartAudio1.Titles.Add("音频1");
         }
 
-        private static void OnAudioSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var view = (AudioView)d;
+        //private static void OnAudioSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    var view = (AudioView)d;
 
-            if (e.OldValue is IAudioSource oldAudioSource)
-                oldAudioSource.FrameReceived -= view.OnFrameReceived;
+        //    if (e.OldValue is IAudioSource oldAudioSource)
+        //        oldAudioSource.FrameReceived -= view.OnFrameReceived;
 
-            if (e.NewValue is IAudioSource newAudioSource)
-                newAudioSource.FrameReceived += view.OnFrameReceived;
-        }
+        //    if (e.NewValue is IAudioSource newAudioSource)
+        //        newAudioSource.FrameReceived += view.OnFrameReceived;
+        //}
 
-        private void OnFrameReceived(object sender, IDecodedAudioFrame decodedFrame)
-        {
-            System.Windows.Application.Current.Dispatcher.Invoke(_invalidateAction, DispatcherPriority.Send, decodedFrame);
-        }
+        //private void OnFrameReceived(object sender, IDecodedAudioFrame decodedFrame)
+        //{
+        //    System.Windows.Application.Current.Dispatcher.Invoke(_invalidateAction, DispatcherPriority.Send, decodedFrame);
+        //}
 
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
         {
