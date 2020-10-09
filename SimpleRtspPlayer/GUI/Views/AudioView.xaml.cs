@@ -110,9 +110,20 @@ namespace SimpleRtspPlayer.GUI.Views
 
             if(audioPlayer.WaveFormat == null)
                 audioPlayer.SetPcmPlayer(decodedAudioFrame.Format.SampleRate, decodedAudioFrame.Format.BitPerSample, decodedAudioFrame.Format.Channels);
+
             audioPlayer.PlayData(decodedAudioFrame.DecodedBytes.Array);
 
             return;
+        }
+
+        public void Silent()
+        {
+            audioPlayer.SilentPlay();
+        }
+
+        public void CancelSilent()
+        {
+            audioPlayer.CancelSilentPlay();
         }
     }
 
@@ -165,6 +176,16 @@ namespace SimpleRtspPlayer.GUI.Views
         {
             if (!isRunning) return;
             bufferedWaveProvider.AddSamples(data, 0, data.Length);
+        }
+
+        public void SilentPlay()
+        {
+            isRunning = false;
+        }
+
+        public void CancelSilentPlay()
+        {
+            isRunning = true;
         }
 
         public void ClosePlay()

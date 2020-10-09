@@ -18,6 +18,7 @@ namespace SimpleRtspPlayer.GUI.ViewModels
         private readonly IMainWindowModel _mainWindowModel;
         private bool _startButtonEnabled = true;
         private bool _stopButtonEnabled;
+        private bool _silentButtonEnabled;
 
         //public string DeviceAddress { get; set; } = "rtsp://192.168.199.86:8554/live/5";
         public string DeviceAddress { get; set; } = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
@@ -30,6 +31,7 @@ namespace SimpleRtspPlayer.GUI.ViewModels
 
         public RelayCommand StartClickCommand { get; }
         public RelayCommand StopClickCommand { get; }
+        public RelayCommand SilentClickCommand { get; }
         public RelayCommand<CancelEventArgs> ClosingCommand { get; }
 
         public string Status
@@ -50,6 +52,7 @@ namespace SimpleRtspPlayer.GUI.ViewModels
             
             StartClickCommand = new RelayCommand(OnStartButtonClick, () => _startButtonEnabled);
             StopClickCommand = new RelayCommand(OnStopButtonClick, () => _stopButtonEnabled);
+            SilentClickCommand = new RelayCommand(OnSilentButtonClick, () => _silentButtonEnabled);
             ClosingCommand = new RelayCommand<CancelEventArgs>(OnClosing);
         }
 
@@ -86,6 +89,8 @@ namespace SimpleRtspPlayer.GUI.ViewModels
 
             _startButtonEnabled = false;
             StartClickCommand.RaiseCanExecuteChanged();
+            _silentButtonEnabled = true;
+            SilentClickCommand.RaiseCanExecuteChanged();
             _stopButtonEnabled = true;
             StopClickCommand.RaiseCanExecuteChanged();
         }
@@ -100,6 +105,11 @@ namespace SimpleRtspPlayer.GUI.ViewModels
             _startButtonEnabled = true;
             StartClickCommand.RaiseCanExecuteChanged();
             Status = string.Empty;
+        }
+
+        private void OnSilentButtonClick()
+        {
+            
         }
 
         private void MainWindowModelOnStatusChanged(object sender, string s)
