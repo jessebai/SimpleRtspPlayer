@@ -42,8 +42,9 @@
             <RowDefinition Height="100" />
         </Grid.RowDefinitions>
         <views:VideoView Grid.Row="0" VideoSource="{Binding VideoSource}" Margin="0,0,752,231" />
-        <views:AudioView x:Name="AudioView1" Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,0,389,231" >
-        </views:AudioView>
+        <views:AudioView x:Name="AudioView1" Grid.Row="0" Margin="445,0,389,231" />
+        <views:AudioView x:Name="AudioView2" Grid.Row="0" Margin="810,0,2,231" />
+        <!--<views:AudioView x:Name="AudioView1" Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,0,389,231" />-->
         <!--<views:AudioView x:Name="AudioView1" Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,0,389,231" />-->
         <!--<views:VideoView Grid.Row="0" VideoSource="{Binding VideoSource}" Margin="0,232,752,231" />
         <views:AudioView Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,232,389,231" />-->

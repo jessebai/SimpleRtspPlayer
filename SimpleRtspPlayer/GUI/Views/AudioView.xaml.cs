@@ -1,72 +1,33 @@
 using System;
-using System.Diagnostics;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using SimpleRtspPlayer.RawFramesDecoding;
 using SimpleRtspPlayer.RawFramesDecoding.DecodedFrames;
-using PixelFormat = SimpleRtspPlayer.RawFramesDecoding.PixelFormat;
-using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using System.Collections;
-using GalaSoft.MvvmLight.Command;
-using System.ComponentModel;
 using System.Net;
-using System.Runtime.CompilerServices;
 using RtspClientSharp;
-using SimpleRtspPlayer.GUI.Models;
-using SimpleRtspPlayer.RawFramesReceiving;
 using System.Security.Authentication;
 using RtspClientSharp.RawFrames;
 using RtspClientSharp.Rtsp;
 using System.Collections.Generic;
-using RtspClientSharp.RawFrames;
 using RtspClientSharp.RawFrames.Audio;
-using SimpleRtspPlayer.RawFramesDecoding;
-using SimpleRtspPlayer.RawFramesDecoding.DecodedFrames;
 using SimpleRtspPlayer.RawFramesDecoding.FFmpeg;
-using SimpleRtspPlayer.RawFramesReceiving;
 
 namespace SimpleRtspPlayer.GUI.Views
 {
-    /// <summary>
-    /// Interaction logic for AudioView.xaml
-    /// </summary>
     public partial class AudioView
     {
         private readonly Action<IDecodedAudioFrame> _invalidateAction;
         private ArrayList audioSeriesData  = new ArrayList();
         public PCMPlayer audioPlayer = new PCMPlayer();
         private bool _audioSilentFlag = false;
-
-        //public static readonly DependencyProperty AudioSourceProperty = DependencyProperty.Register(nameof(AudioSource),
-        //    typeof(IAudioSource),
-        //    typeof(AudioView),
-        //    new FrameworkPropertyMetadata(OnAudioSourceChanged));
-        public IAudioSource AudioSource
-        {
-            get => (IAudioSource)GetValue(AudioSourceProperty);
-            set => SetValue(AudioSourceProperty, value);
-        }
-
-        //private bool _startButtonEnabled = true;
-        //private bool _stopButtonEnabled;
-        //private bool _silentButtonEnabled;
         private const string RtspPrefix = "rtsp://";
         private const string HttpPrefix = "http://";
         private string _status = string.Empty;
-        private readonly RealtimeVideoSource _realtimeVideoSource = new RealtimeVideoSource();
-        private readonly RealtimeAudioSource _realtimeAudioSource = new RealtimeAudioSource();
-        //private IRawFramesSource _rawFramesSource;
-        //public event EventHandler<string> StatusChanged;
-        public IVideoSource I_VideoSource => _realtimeVideoSource;
-        public IAudioSource I_AudioSource => _realtimeAudioSource;
         public string DeviceAddress { get; set; } = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
         public string Login { get; set; } = "";
         public string Password { get; set; } = "";
@@ -91,29 +52,13 @@ namespace SimpleRtspPlayer.GUI.Views
             var credential = new NetworkCredential(Login, Password);
             var connectionParameters = new ConnectionParameters(deviceUri, credential);
             _connectionParameters = connectionParameters;
-
-            //if (_rawFramesSource != null)
-            //    return;
-
-            //_rawFramesSource = new RawFramesSource(connectionParameters);
-            ////_rawFramesSource.ConnectionStatusChanged += ConnectionStatusChanged;
-
-            //_realtimeVideoSource.SetRawFramesSource(_rawFramesSource);
-            //_realtimeAudioSource.SetRawFramesSource(_rawFramesSource);
-            //_rawFramesSource.Start();
-
             _cancellationTokenSource = new CancellationTokenSource();
-
             CancellationToken token = _cancellationTokenSource.Token;
 
             _workTask = _workTask.ContinueWith(async p =>
             {
                 await ReceiveAsync(token);
             }, token);
-
-
-            //_mainWindowModel.Start(connectionParameters);
-            //_mainWindowModel.StatusChanged += MainWindowModelOnStatusChanged;
         }
         private void OnAudioStopClick(object sender, RoutedEventArgs e)
         {
@@ -235,22 +180,6 @@ namespace SimpleRtspPlayer.GUI.Views
             _invalidateAction = Invalidate;
             ChartAudio1.Titles.Add("音频1");
         }
-
-        //private static void OnAudioSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    var view = (AudioView)d;
-
-        //    if (e.OldValue is IAudioSource oldAudioSource)
-        //        oldAudioSource.FrameReceived -= view.OnFrameReceived;
-
-        //    if (e.NewValue is IAudioSource newAudioSource)
-        //        newAudioSource.FrameReceived += view.OnFrameReceived;
-        //}
-
-        //private void OnFrameReceived(object sender, IDecodedAudioFrame decodedFrame)
-        //{
-        //    System.Windows.Application.Current.Dispatcher.Invoke(_invalidateAction, DispatcherPriority.Send, decodedFrame);
-        //}
 
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
         {
