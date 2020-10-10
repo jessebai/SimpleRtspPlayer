@@ -63,9 +63,9 @@ namespace SimpleRtspPlayer.GUI.Views
         private void OnAudioStopClick(object sender, RoutedEventArgs e)
         {
             _cancellationTokenSource.Cancel();
-            ChartAudio1.Series.Clear();
+            ChartAudio.Series.Clear();
             audioSeriesData.Clear();
-            ChartAudio1.ChartAreas.Clear();
+            ChartAudio.ChartAreas.Clear();
             _audioSilentFlag = false;
         }
         private void OnAudioSilentClick(object sender, RoutedEventArgs e)
@@ -178,17 +178,17 @@ namespace SimpleRtspPlayer.GUI.Views
         {
             InitializeComponent();
             _invalidateAction = Invalidate;
-            ChartAudio1.Titles.Add("音频1");
+            ChartAudio.Titles.Add("音频1");
         }
 
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
         {
-            ChartAudio1.Series.Clear();
+            ChartAudio.Series.Clear();
             audioSeriesData.Clear();
-            ChartAudio1.ChartAreas.Clear();
-            Series seriesAudio = ChartAudio1.Series.Add("Audio");
+            ChartAudio.ChartAreas.Clear();
+            Series seriesAudio = ChartAudio.Series.Add("Audio");
             seriesAudio.ChartType = SeriesChartType.Spline;
-            ChartAudio1.ChartAreas.Add("1");
+            ChartAudio.ChartAreas.Add("1");
             seriesAudio.ChartArea = "1";
 
             int len = decodedAudioFrame.DecodedBytes.Count;
@@ -226,7 +226,7 @@ namespace SimpleRtspPlayer.GUI.Views
                     audioSeriesData.Add(audioData);
                 }
             }
-            ChartAudio1.Series[0].Points.DataBindY(audioSeriesData);
+            ChartAudio.Series[0].Points.DataBindY(audioSeriesData);
 
             if(audioPlayer.WaveFormat == null)
                 audioPlayer.SetPcmPlayer(decodedAudioFrame.Format.SampleRate, decodedAudioFrame.Format.BitPerSample, decodedAudioFrame.Format.Channels);

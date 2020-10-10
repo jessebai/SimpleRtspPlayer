@@ -8,15 +8,13 @@
              xmlns:Chr="clr-namespace:System.Windows.Forms.DataVisualization.Charting;assembly=System.Windows.Forms.DataVisualization"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <!--<Image x:Name="AudioImage" x:FieldModifier="private" SnapsToDevicePixels="True" UseLayoutRounding="True" />-->
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <WindowsFormsHost x:Name="WFHost_HistoryFlow" Margin="1">
-            <Chr:Chart x:Name="ChartAudio1" Dock="Fill" BackColor="WhiteSmoke" />
+            <Chr:Chart x:Name="ChartAudio" Dock="Fill" BackColor="WhiteSmoke" />
         </WindowsFormsHost>
         <Grid Grid.Row="1" Margin="2">
             <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="2">
@@ -27,6 +25,6 @@
         </Grid>
     </Grid>
     <!--<WindowsFormsHost x:Name="WFHost_HistoryFlow" Margin="1">
-        <Chr:Chart x:Name="ChartAudio1" Dock="Fill" BackColor="WhiteSmoke" />
+        <Chr:Chart x:Name="ChartAudio" Dock="Fill" BackColor="WhiteSmoke" />
     </WindowsFormsHost>-->
 </UserControl>
