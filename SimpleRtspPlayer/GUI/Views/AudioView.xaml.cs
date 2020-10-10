@@ -178,7 +178,7 @@ namespace SimpleRtspPlayer.GUI.Views
         {
             InitializeComponent();
             _invalidateAction = Invalidate;
-            ChartAudio.Titles.Add("音频1");
+            //ChartAudio.Titles.Add("音频1");
         }
 
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
@@ -190,6 +190,8 @@ namespace SimpleRtspPlayer.GUI.Views
             seriesAudio.ChartType = SeriesChartType.Spline;
             ChartAudio.ChartAreas.Add("1");
             seriesAudio.ChartArea = "1";
+            ChartAudio.ChartAreas[0].AxisX.Enabled = AxisEnabled.False;
+            ChartAudio.ChartAreas[0].AxisY.Enabled = AxisEnabled.False;
 
             int len = decodedAudioFrame.DecodedBytes.Count;
             int singleLen = decodedAudioFrame.Format.BitPerSample / 8;
