@@ -30,7 +30,8 @@ namespace SimpleRtspPlayer.GUI.Views
         private const string RtspPrefix = "rtsp://";
         private const string HttpPrefix = "http://";
         private string _status = string.Empty;
-        public string DeviceAddress { get; set; } = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+        //public string DeviceAddress { get; set; } = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
+        public string DeviceAddress { get; set; } = "rtsp://192.168.199.86:8554/live/4";
         public string Login { get; set; } = "";
         public string Password { get; set; } = "";
         private Task _workTask = Task.CompletedTask;
@@ -194,8 +195,8 @@ namespace SimpleRtspPlayer.GUI.Views
         }
 
         public long frames = 0;
-        public readonly int partOfSingleFrame = 1;
-        public readonly int partOfTotalFrames = 1;
+        public readonly int partOfSingleFrame = 20;
+        public readonly int partOfTotalFrames = 3;
         //convert decodedAudioFrame to wave and sound
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
         {

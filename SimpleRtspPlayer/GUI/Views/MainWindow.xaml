@@ -44,10 +44,20 @@
         <views:VideoView Grid.Row="0" VideoSource="{Binding VideoSource}" Margin="0,0,752,231" />
         <views:AudioView x:Name="AudioView1" Grid.Row="0" Margin="445,0,389,231" />
         <views:AudioView x:Name="AudioView2" Grid.Row="0" Margin="810,0,2,231" />
-        <!--<views:AudioView x:Name="AudioView1" Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,0,389,231" />-->
-        <!--<views:AudioView x:Name="AudioView1" Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,0,389,231" />-->
-        <!--<views:VideoView Grid.Row="0" VideoSource="{Binding VideoSource}" Margin="0,232,752,231" />
-        <views:AudioView Grid.Row="0" AudioSource="{Binding AudioSource}" Margin="445,232,389,231" />-->
+        <views:AudioView x:Name="AudioView3" Grid.Row="0" Margin="0,283,1000,129" />
+        <views:AudioView x:Name="AudioView4" Grid.Row="0" Margin="200,283,800,129" />
+        <views:AudioView x:Name="AudioView5" Grid.Row="0" Margin="400,283,600,129" />
+        <views:AudioView x:Name="AudioView6" Grid.Row="0" Margin="600,283,400,129" />
+        <views:AudioView x:Name="AudioView7" Grid.Row="0" Margin="800,283,200,129" />
+        <views:AudioView x:Name="AudioView8" Grid.Row="0" Margin="1000,283,0,129" />
+        <views:AudioView x:Name="AudioView9" Grid.Row="0" Margin="0,400,1000,0" />
+        <views:AudioView x:Name="AudioView10" Grid.Row="0" Margin="200,400,800,0" />
+        <views:AudioView x:Name="AudioView11" Grid.Row="0" Margin="400,400,600,0" />
+        <views:AudioView x:Name="AudioView12" Grid.Row="0" Margin="600,400,400,0" />
+        <views:AudioView x:Name="AudioView13" Grid.Row="0" Margin="800,400,200,0" />
+        <views:AudioView x:Name="AudioView14" Grid.Row="0" Margin="1000,400,0,0" />
+        <views:AudioView x:Name="AudioView15" Grid.Row="0" Margin="0,0,1000,250" />
+        <views:AudioView x:Name="AudioView16" Grid.Row="0" Margin="200,0,800,250" />
         <Grid Grid.Row="1" Margin="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
