@@ -21,25 +21,42 @@ namespace SimpleRtspPlayer.GUI.Views
 {
     public partial class AudioView
     {
+        ////important parameters!!!////
+        //control the max number of points shown in the chart.
+        public readonly int maxPointsInChart = 50;
+        //control the fps of the chart.
+        public readonly int fpsChart = 4;
+        //rtsp address, need to be changed in the codes where invoke this AudioView
+        public string DeviceAddress { get; set; } = "rtsp://192.168.199.86:8554/live/4";
+        //user name
+        public string Login { get; set; } = "";
+        //password
+        public string Password { get; set; } = "";
+        ////important parameters!!!////
+
+        //show the audio status(silence or not)
+        private bool _audioSilentFlag = false;
+
         private readonly Action<IDecodedAudioFrame> _invalidateAction;
+        //all data in a frame
         private ArrayList audioSeriesData  = new ArrayList();
-        System.Data.DataTable chartDataTable = new System.Data.DataTable("MyTable");
+        //part of the data in one frame which will be shown in the chart
+        private ArrayList audioSeriesDataPart = new ArrayList();
         public Series seriesAudio;
         public PCMPlayer audioPlayer = new PCMPlayer();
-        private bool _audioSilentFlag = false;
         private const string RtspPrefix = "rtsp://";
         private const string HttpPrefix = "http://";
-        private string _status = string.Empty;
         //public string DeviceAddress { get; set; } = "rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov";
-        public string DeviceAddress { get; set; } = "rtsp://192.168.199.86:8554/live/4";
-        public string Login { get; set; } = "";
-        public string Password { get; set; } = "";
+        private string _status = string.Empty;
+        public long frames = 0;
         private Task _workTask = Task.CompletedTask;
         private CancellationTokenSource _cancellationTokenSource;
         private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(5);
         private ConnectionParameters _connectionParameters;
         private readonly Dictionary<FFmpegAudioCodecId, FFmpegAudioDecoder> _audioDecodersMap =
             new Dictionary<FFmpegAudioCodecId, FFmpegAudioDecoder>();
+        
+        //push start button, start to obtain the rtsp stream with async task
         private void OnAudioStartClick(object sender, RoutedEventArgs e)
         {
             string address = DeviceAddress;
@@ -63,14 +80,19 @@ namespace SimpleRtspPlayer.GUI.Views
                 await ReceiveAsync(token);
             }, token);
         }
+
+        //push the stop button, stop the connection to the rtsp address
         private void OnAudioStopClick(object sender, RoutedEventArgs e)
         {
             _cancellationTokenSource.Cancel();
             ChartAudio.Series.Clear();
             audioSeriesData.Clear();
+            audioSeriesDataPart.Clear();
             ChartAudio.ChartAreas.Clear();
             _audioSilentFlag = false;
         }
+
+        //click the silent button
         private void OnAudioSilentClick(object sender, RoutedEventArgs e)
         {
             if (_audioSilentFlag)//now silent
@@ -107,7 +129,7 @@ namespace SimpleRtspPlayer.GUI.Views
                             await Task.Delay(RetryDelay, token);
                             continue;
                         }
-                        catch (RtspClientException e)
+                        catch (RtspClientException)
                         {
                             //OnStatusChanged(e.ToString());
                             await Task.Delay(RetryDelay, token);
@@ -120,7 +142,7 @@ namespace SimpleRtspPlayer.GUI.Views
                         {
                             await rtspClient.ReceiveAsync(token);
                         }
-                        catch (RtspClientException e)
+                        catch (RtspClientException)
                         {
                             //OnStatusChanged(e.ToString());
                             await Task.Delay(RetryDelay, token);
@@ -133,6 +155,7 @@ namespace SimpleRtspPlayer.GUI.Views
             }
         }
 
+        //convert the raw frame to decoded frame
         private void RtspClientOnFrameReceived(object sender, RawFrame rawFrame)
         {
             if (!(rawFrame is RawAudioFrame rawAudioFrame))
@@ -143,6 +166,7 @@ namespace SimpleRtspPlayer.GUI.Views
             if (!decoder.TryDecode(rawAudioFrame))
                 return;
 
+            //OutBitsPerSample may need to be set by user or the program?
             IDecodedAudioFrame decodedFrame = decoder.GetDecodedFrame(new AudioConversionParameters() { OutBitsPerSample = 16 });
             System.Windows.Application.Current.Dispatcher.Invoke(_invalidateAction, DispatcherPriority.Send, decodedFrame);
         }
@@ -181,6 +205,9 @@ namespace SimpleRtspPlayer.GUI.Views
         {
             InitializeComponent();
             _invalidateAction = Invalidate;
+
+            //intialize the chart elements
+            //the title of the chart may need to be changed
             //ChartAudio.Titles.Add("音频1");
             seriesAudio = ChartAudio.Series.Add("Audio");
             seriesAudio.ChartType = SeriesChartType.Spline;
@@ -190,24 +217,22 @@ namespace SimpleRtspPlayer.GUI.Views
             ChartAudio.ChartAreas[0].AxisY.Enabled = AxisEnabled.False;
             ChartAudio.ChartAreas[0].AxisY.Minimum = 0;
             ChartAudio.ChartAreas[0].AxisY.Maximum = 65535;
-            chartDataTable.Columns.Add("soundData", typeof(int));
             //ChartAudio.Series[0].Points.DataBindY(audioSeriesData);
         }
 
-        public long frames = 0;
-        public readonly int partOfSingleFrame = 20;
-        public readonly int partOfTotalFrames = 3;
+
         //convert decodedAudioFrame to wave and sound
         private void Invalidate(IDecodedAudioFrame decodedAudioFrame)
         {
             frames++;
             audioSeriesData.Clear();
-            chartDataTable.Rows.Clear();
+            audioSeriesDataPart.Clear();
             int len = decodedAudioFrame.DecodedBytes.Count;
             int singleLen = decodedAudioFrame.Format.BitPerSample / 8;
+            // convert the pcm data to ArrayList, each element in the array represents a sample 
             if (decodedAudioFrame.Format.BitPerSample == 16)
             {
-                for (int i = 0; i < len / partOfSingleFrame; i = i + singleLen)
+                for (int i = 0; i < len; i = i + singleLen)
                 {
                     //only consider the bitPerSample == 16
                     int audioData = 0;
@@ -220,12 +245,15 @@ namespace SimpleRtspPlayer.GUI.Views
                     else
                         audioData = decodedAudioFrame.DecodedBytes.Array[i] * 255 + decodedAudioFrame.DecodedBytes.Array[i + 1];
                     audioSeriesData.Add(audioData);
-                    chartDataTable.Rows.Add(audioData);
+                    if (i < maxPointsInChart)
+                    {
+                        audioSeriesDataPart.Add(audioData);
+                    }
                 }
             }
             else if (decodedAudioFrame.Format.BitPerSample == 8)
             {
-                for (int i = 0; i < len / partOfSingleFrame; i = i + singleLen)
+                for (int i = 0; i < len; i = i + singleLen)
                 {
                     int audioData = 0;
                     if (decodedAudioFrame.Format.Channels != 1)
@@ -236,10 +264,16 @@ namespace SimpleRtspPlayer.GUI.Views
                     else
                         audioData = decodedAudioFrame.DecodedBytes.Array[i];
                     audioSeriesData.Add(audioData);
+                    if (i < maxPointsInChart)
+                    {
+                        audioSeriesDataPart.Add(audioData);
+                    }
                 }
             }
 
-            if (frames % partOfTotalFrames == 0)
+            //only one in several frames will be shown in the chart
+            int fps = System.Math.Abs(decodedAudioFrame.Format.BytesPerSecond / len);
+            if (frames % (fps/fpsChart) == 0)
             {
                 DrawChart();
             }
@@ -254,14 +288,13 @@ namespace SimpleRtspPlayer.GUI.Views
             return;
         }
 
+        //draw chart with the current data
         public void DrawChart()
         {
-            //ChartAudio.Series.Clear();
-            //ChartAudio.ChartAreas.Clear();
-            ChartAudio.Series[0].Points.DataBindY(audioSeriesData);
-            //ChartAudio.Series[0].Points.DataBindY
+            ChartAudio.Series[0].Points.DataBindY(audioSeriesDataPart);
         }
 
+        //silent the audioPlayer
         public void Silent()
         {
             audioPlayer.SilentPlay();
@@ -278,6 +311,7 @@ namespace SimpleRtspPlayer.GUI.Views
         private MonoToStereoProvider16 monoToStereoProvider16;
         private BufferedWaveProvider bufferedWaveProvider;
         private WaveOut waveOut;
+        public WaveFormat WaveFormat { get; private set; }
         private bool isRunning = false;
         
         public PCMPlayer()
@@ -300,6 +334,8 @@ namespace SimpleRtspPlayer.GUI.Views
             waveOut.Play();
             isRunning = true;
         }
+
+        //after use the empty construct function, set the important vars 
         public void SetPcmPlayer(int sampleRate, int bitsPerSample, int channels)
         {
             WaveFormat = new WaveFormat(sampleRate, bitsPerSample, channels);
@@ -318,10 +354,19 @@ namespace SimpleRtspPlayer.GUI.Views
             isRunning = true;
         }
 
+        //add data to the buffer, then the data in the buffer will be converted to the sound automatically 
         public void PlayData(byte[] data)
         {
             if (!isRunning) return;
-            bufferedWaveProvider.AddSamples(data, 0, data.Length);
+            try
+            {
+                bufferedWaveProvider.AddSamples(data, 0, data.Length);
+            }
+            //handle the full buffer problem!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            catch (Exception)
+            {
+                bufferedWaveProvider.ClearBuffer();
+            }
         }
 
         public void SilentPlay()
@@ -340,7 +385,6 @@ namespace SimpleRtspPlayer.GUI.Views
             waveOut.Stop();
             waveOut.Dispose();
         }
-        public WaveFormat WaveFormat { get; private set; }
     }
 }
 
